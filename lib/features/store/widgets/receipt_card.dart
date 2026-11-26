@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/utils/responsive_layout.dart';
 import 'app_surface_card.dart';
 
 /// Displays the itemized receipt details, optional voucher code copy box, and QR.
@@ -30,8 +31,10 @@ class ReceiptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = ResponsiveLayout.of(context);
+
     return AppSurfaceCard(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(layout.isCompactWidth ? 14 : 18),
       child: Column(
         children: [
           const Text(
@@ -45,6 +48,9 @@ class ReceiptCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             productTitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
@@ -81,8 +87,8 @@ class ReceiptCard extends StatelessWidget {
             label: 'الرصيد المتبقي',
             value: '${remainingBalance.toStringAsFixed(2)} $currencyLabel',
           ),
-          const SizedBox(height: AppDimensions.sectionSpacing),
-          const Icon(Icons.qr_code_2_rounded, size: 68),
+          SizedBox(height: layout.sectionSpacing),
+          Icon(Icons.qr_code_2_rounded, size: layout.receiptQrSize),
           const SizedBox(height: 6),
           Text(
             'شكراً لتعاملكم مع Y eCard',
@@ -162,12 +168,17 @@ class _ReceiptDetailRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: valueColor,
+          Flexible(
+            child: Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: valueColor,
+              ),
             ),
           ),
         ],

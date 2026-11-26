@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/utils/responsive_layout.dart';
 
 /// Quick quantity selector pills for product orders.
 class QuantitySelector extends StatelessWidget {
@@ -19,6 +20,7 @@ class QuantitySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final layout = ResponsiveLayout.of(context);
     final inactiveBackground =
         isDark ? AppColors.darkElevatedSurface : AppColors.lightElevatedSurface;
 
@@ -32,19 +34,23 @@ class QuantitySelector extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: AppDimensions.smallSpacing),
-        Row(
+        SizedBox(height: layout.smallSpacing),
+        Wrap(
+          spacing: layout.smallSpacing,
+          runSpacing: layout.smallSpacing,
           children: quantityOptions.map((quantityOption) {
             final isSelected = selectedQuantity == quantityOption;
 
-            return Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: InkWell(
-                onTap: () => onQuantitySelected(quantityOption),
-                borderRadius: BorderRadius.circular(AppDimensions.badgeRadius),
+            return InkWell(
+              onTap: () => onQuantitySelected(quantityOption),
+              borderRadius: BorderRadius.circular(AppDimensions.badgeRadius),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: layout.quantityPillWidth,
+                  minHeight: layout.quantityPillHeight,
+                ),
                 child: Container(
-                  width: 44,
-                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primaryViolet
@@ -52,14 +58,18 @@ class QuantitySelector extends StatelessWidget {
                     borderRadius:
                         BorderRadius.circular(AppDimensions.badgeRadius),
                   ),
-                  child: Center(
-                    child: Text(
-                      '$quantityOption',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isSelected ? AppColors.pureWhite : null,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$quantityOption',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isSelected ? AppColors.pureWhite : null,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

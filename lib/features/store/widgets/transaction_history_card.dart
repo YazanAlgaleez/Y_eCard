@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../models/store_transaction_model.dart';
 import 'app_surface_card.dart';
 
@@ -19,7 +20,10 @@ class TransactionHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = ResponsiveLayout.of(context);
+
     return AppSurfaceCard(
+      padding: EdgeInsets.all(layout.cardPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

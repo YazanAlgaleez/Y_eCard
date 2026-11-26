@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/utils/responsive_layout.dart';
 
 /// Horizontal scrollable category filter chips for the product catalog.
 class CategoryFilterBar extends StatelessWidget {
@@ -23,7 +24,7 @@ class CategoryFilterBar extends StatelessWidget {
         isDark ? AppColors.darkElevatedSurface : AppColors.lightElevatedSurface;
 
     return SizedBox(
-      height: 36,
+      height: ResponsiveLayout.of(context).filterBarHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,

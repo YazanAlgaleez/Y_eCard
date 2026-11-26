@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/utils/responsive_layout.dart';
+import '../../../core/widgets/responsive_page_container.dart';
 import '../../printer/cubit/printer_cubit.dart';
 import '../../printer/cubit/printer_state.dart';
 import '../data/mock_store_data.dart';
@@ -72,117 +74,118 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final layout = ResponsiveLayout.of(context);
     final selectedPackage = MockStoreData.packageOptions[_selectedPackageIndex];
     final totalPrice = selectedPackage.price * _selectedQuantity;
     final formattedBalance =
         '${MockStoreData.walletBalance.toStringAsFixed(2)} ${MockStoreData.currencyLabel}';
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.screenHorizontalPadding,
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: AppDimensions.itemSpacing),
-              ScreenBackHeader(title: widget.product.title),
-              const SizedBox(height: AppDimensions.itemSpacing),
-              _ProductWalletBanner(
-                product: widget.product,
-                balanceLabel: formattedBalance,
+      body: ResponsivePageContainer(
+        child: Column(
+          children: [
+            SizedBox(height: layout.itemSpacing),
+            ScreenBackHeader(title: widget.product.title),
+            SizedBox(height: layout.itemSpacing),
+            _ProductWalletBanner(
+              product: widget.product,
+              balanceLabel: formattedBalance,
+            ),
+            SizedBox(height: layout.itemSpacing),
+            if (widget.product.supportsDirectId &&
+                widget.product.supportsVoucherCode)
+              DeliveryTypeSelector(
+                isDirectIdSelected: _isDirectIdDelivery,
+                onDeliveryTypeChanged: (isDirectId) =>
+                    setState(() => _isDirectIdDelivery = isDirectId),
               ),
-              const SizedBox(height: AppDimensions.itemSpacing),
-              if (widget.product.supportsDirectId &&
-                  widget.product.supportsVoucherCode)
-                DeliveryTypeSelector(
-                  isDirectIdSelected: _isDirectIdDelivery,
-                  onDeliveryTypeChanged: (isDirectId) =>
-                      setState(() => _isDirectIdDelivery = isDirectId),
-                ),
-              if (widget.product.regions.length > 1) ...[
-                const SizedBox(height: 10),
-                RegionSelectorBar(
-                  regions: widget.product.regions,
-                  selectedRegion: _selectedRegion,
-                  onRegionSelected: (region) =>
-                      setState(() => _selectedRegion = region),
-                ),
-              ],
-              const SizedBox(height: AppDimensions.itemSpacing),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PackageOptionGrid(
-                        packageOptions: MockStoreData.packageOptions,
-                        selectedIndex: _selectedPackageIndex,
-                        currencyLabel: MockStoreData.currencyLabel,
-                        onPackageSelected: (index) =>
-                            setState(() => _selectedPackageIndex = index),
-                      ),
-                      const SizedBox(height: 14),
-                      if (_isDirectIdDelivery) ...[
-                        PlayerIdInputCard(controller: _playerIdController),
-                        const SizedBox(height: 14),
-                      ],
-                      QuantitySelector(
-                        quantityOptions: MockStoreData.quantityOptions,
-                        selectedQuantity: _selectedQuantity,
-                        onQuantitySelected: (quantity) =>
-                            setState(() => _selectedQuantity = quantity),
-                      ),
-                    ],
-                  ),
-                ),
+            if (widget.product.regions.length > 1) ...[
+              SizedBox(height: layout.smallSpacing),
+              RegionSelectorBar(
+                regions: widget.product.regions,
+                selectedRegion: _selectedRegion,
+                onRegionSelected: (region) =>
+                    setState(() => _selectedRegion = region),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: AppDimensions.itemSpacing,
-                ),
+            ],
+            SizedBox(height: layout.itemSpacing),
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'السعر الإجمالي',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
+                    PackageOptionGrid(
+                      packageOptions: MockStoreData.packageOptions,
+                      selectedIndex: _selectedPackageIndex,
+                      currencyLabel: MockStoreData.currencyLabel,
+                      onPackageSelected: (index) =>
+                          setState(() => _selectedPackageIndex = index),
+                    ),
+                    SizedBox(height: layout.sectionSpacing),
+                    if (_isDirectIdDelivery) ...[
+                      PlayerIdInputCard(controller: _playerIdController),
+                      SizedBox(height: layout.sectionSpacing),
+                    ],
+                    QuantitySelector(
+                      quantityOptions: MockStoreData.quantityOptions,
+                      selectedQuantity: _selectedQuantity,
+                      onQuantitySelected: (quantity) =>
+                          setState(() => _selectedQuantity = quantity),
+                    ),
+                    SizedBox(height: layout.smallSpacing),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: layout.itemSpacing),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'السعر الإجمالي',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
-                        const SizedBox(width: 8),
-                        Text(
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
                           '${totalPrice.toStringAsFixed(2)} ${MockStoreData.currencyLabel}',
-                          style: const TextStyle(
-                            fontSize: 20,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: layout.scaledFontSize(20),
                             fontWeight: FontWeight.w800,
                             color: AppColors.primaryViolet,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    BlocBuilder<PrinterCubit, PrinterState>(
-                      builder: (context, printerState) {
-                        return ElevatedButton(
-                          onPressed: _confirmPurchase,
-                          child: Text(
-                            printerState.isConnected
-                                ? 'تأكيد الشراء وطباعة الإيصال'
-                                : 'تأكيد الشراء',
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: layout.smallSpacing),
+                  BlocBuilder<PrinterCubit, PrinterState>(
+                    builder: (context, printerState) {
+                      return ElevatedButton(
+                        onPressed: _confirmPurchase,
+                        child: Text(
+                          printerState.isConnected
+                              ? 'تأكيد الشراء وطباعة الإيصال'
+                              : 'تأكيد الشراء',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -200,12 +203,15 @@ class _ProductWalletBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = ResponsiveLayout.of(context);
+
     return AppSurfaceCard(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(layout.cardPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
+            flex: 3,
             child: Row(
               children: [
                 Container(
@@ -241,18 +247,23 @@ class _ProductWalletBanner extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: AppColors.primaryViolet.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppDimensions.badgeRadius),
-            ),
-            child: const Text(
-              MockStoreData.merchantTierLabel,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryViolet,
+          Flexible(
+            flex: 2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.primaryViolet.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppDimensions.badgeRadius),
+              ),
+              child: const Text(
+                MockStoreData.merchantTierLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryViolet,
+                ),
               ),
             ),
           ),

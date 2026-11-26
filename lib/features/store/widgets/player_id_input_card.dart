@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/theme/app_styles.dart';
+import '../../../core/utils/responsive_layout.dart';
 import 'app_surface_card.dart';
 
 /// Input field for entering or pasting a game Player ID.
@@ -23,6 +24,8 @@ class PlayerIdInputCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = ResponsiveLayout.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -35,7 +38,10 @@ class PlayerIdInputCard extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         AppSurfaceCard(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          padding: EdgeInsets.symmetric(
+            horizontal: layout.cardPadding,
+            vertical: 2,
+          ),
           borderRadius: AppDimensions.inputRadius,
           child: Row(
             children: [

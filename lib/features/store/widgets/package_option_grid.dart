@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../models/package_option_model.dart';
 import 'app_surface_card.dart';
 
@@ -21,14 +22,16 @@ class PackageOptionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final layout = ResponsiveLayout.of(context);
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: layout.packageGridColumns,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
-        childAspectRatio: 1.65,
+        childAspectRatio: layout.packageCardAspectRatio,
       ),
       itemCount: packageOptions.length,
       itemBuilder: (context, index) {
@@ -36,6 +39,10 @@ class PackageOptionGrid extends StatelessWidget {
         final isSelected = selectedIndex == index;
 
         return AppSurfaceCard(
+          padding: EdgeInsets.symmetric(
+            horizontal: layout.smallSpacing,
+            vertical: layout.smallSpacing,
+          ),
           isSelected: isSelected,
           onTap: () => onPackageSelected(index),
           child: Column(
@@ -43,11 +50,15 @@ class PackageOptionGrid extends StatelessWidget {
             children: [
               Text(
                 packageOption.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 4),
               Text(
                 '${packageOption.price.toStringAsFixed(2)} $currencyLabel',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

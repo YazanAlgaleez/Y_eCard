@@ -14,3 +14,7 @@ class StoreTransactionModel {
     this.isPrintable = true,
   });
 }
+
+
+
+

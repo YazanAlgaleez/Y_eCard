@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../../printer/cubit/printer_state.dart';
 import 'app_surface_card.dart';
 
@@ -19,8 +20,10 @@ class PrinterConnectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isConnected = printerState.isConnected;
     final secondaryColor = Theme.of(context).textTheme.bodySmall?.color;
+    final layout = ResponsiveLayout.of(context);
 
     return AppSurfaceCard(
+      padding: EdgeInsets.all(layout.cardPadding),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -38,6 +41,8 @@ class PrinterConnectionCard extends StatelessWidget {
                     children: [
                       Text(
                         'الطابعة الحرارية (بلوتوث)',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       Text(
@@ -58,6 +63,7 @@ class PrinterConnectionCard extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 8),
           Switch(
             value: isConnected,
             onChanged: (_) => onToggleConnection(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/app_styles.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../models/product_model.dart';
 import 'app_surface_card.dart';
 
@@ -19,8 +20,10 @@ class ProductGridCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subtitleColor = Theme.of(context).textTheme.bodySmall?.color;
+    final layout = ResponsiveLayout.of(context);
 
     return AppSurfaceCard(
+      padding: EdgeInsets.all(layout.cardPadding),
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,6 +38,8 @@ class ProductGridCard extends StatelessWidget {
               ),
               child: Text(
                 product.badge,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
@@ -44,23 +49,29 @@ class ProductGridCard extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Center(
-            child: Container(
-              width: 54,
-              height: 54,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  colors: [
-                    product.accentColor.withValues(alpha: 0.28),
-                    product.accentColor.withValues(alpha: 0.08),
-                  ],
+          Flexible(
+            flex: 3,
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Container(
+                  width: layout.productIconBoxSize,
+                  height: layout.productIconBoxSize,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      colors: [
+                        product.accentColor.withValues(alpha: 0.28),
+                        product.accentColor.withValues(alpha: 0.08),
+                      ],
+                    ),
+                  ),
+                  child: Icon(
+                    product.icon,
+                    size: layout.productIconSize,
+                    color: product.accentColor,
+                  ),
                 ),
-              ),
-              child: Icon(
-                product.icon,
-                size: 30,
-                color: product.accentColor,
               ),
             ),
           ),

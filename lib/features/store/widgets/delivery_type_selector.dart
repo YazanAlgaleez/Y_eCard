@@ -60,7 +60,7 @@ class _DeliverySegmentButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppDimensions.badgeRadius),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primaryViolet : Colors.transparent,
           borderRadius: BorderRadius.circular(AppDimensions.badgeRadius),
@@ -68,6 +68,8 @@ class _DeliverySegmentButton extends StatelessWidget {
         child: Center(
           child: Text(
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,

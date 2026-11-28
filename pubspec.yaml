@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  permission_handler: ^13.0.2
+  print_bluetooth_thermal: ^1.2.5
 
 dev_dependencies:
   flutter_test:

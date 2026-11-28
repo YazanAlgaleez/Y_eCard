@@ -6,13 +6,12 @@ import '../../../core/widgets/responsive_page_container.dart';
 import '../../printer/cubit/printer_cubit.dart';
 import '../../printer/cubit/printer_state.dart';
 import '../data/mock_store_data.dart';
-import '../widgets/printer_connection_card.dart';
 import '../widgets/screen_back_header.dart';
 import '../widgets/transaction_history_card.dart';
 
-/// Displays Bluetooth thermal printer settings and recent wallet transactions.
-class HistoryAccountScreen extends StatelessWidget {
-  const HistoryAccountScreen({super.key});
+/// Independent transaction history screen.
+class TransactionsHistoryScreen extends StatelessWidget {
+  const TransactionsHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,23 +23,8 @@ class HistoryAccountScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: layout.itemSpacing),
-            const ScreenBackHeader(title: 'السجل والحساب'),
+            const ScreenBackHeader(title: 'سجل العمليات'),
             SizedBox(height: layout.itemSpacing),
-            BlocBuilder<PrinterCubit, PrinterState>(
-              builder: (context, printerState) {
-                return PrinterConnectionCard(
-                  printerState: printerState,
-                  onToggleConnection: () =>
-                      context.read<PrinterCubit>().toggleConnection(),
-                );
-              },
-            ),
-            SizedBox(height: layout.sectionSpacing),
-            Text(
-              'العمليات الأخيرة',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            SizedBox(height: layout.smallSpacing),
             Expanded(
               child: BlocBuilder<PrinterCubit, PrinterState>(
                 builder: (context, printerState) {

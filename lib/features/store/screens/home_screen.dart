@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_styles.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../core/widgets/responsive_page_container.dart';
+import '../../printer/cubit/printer_cubit.dart';
+import '../../printer/cubit/printer_state.dart';
 import '../../theme/cubit/theme_cubit.dart';
 import '../data/mock_store_data.dart';
 import '../models/product_model.dart';
@@ -12,9 +14,11 @@ import '../widgets/category_filter_bar.dart';
 import '../widgets/product_grid_card.dart';
 import '../widgets/store_header.dart';
 import '../widgets/wallet_summary_row.dart';
-import 'history_account_screen.dart';
+import 'account_settings_screen.dart';
 import 'levels_screen.dart';
+import 'printer_settings_screen.dart';
 import 'product_details_screen.dart';
+import 'transactions_history_screen.dart';
 
 /// Main store catalog screen with wallet summary, search, category filters,
 /// and product grid.
@@ -47,10 +51,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }).toList();
   }
 
-  void _openAccountHistory() {
+  void _openAccountSettings() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const HistoryAccountScreen()),
+      MaterialPageRoute(builder: (_) => const AccountSettingsScreen()),
+    );
+  }
+
+  void _openTransactionsHistory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const TransactionsHistoryScreen()),
+    );
+  }
+
+  void _openPrinterSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PrinterSettingsScreen()),
     );
   }
 
@@ -88,9 +106,43 @@ class _HomeScreenState extends State<HomeScreen> {
               onSupportPressed: () {},
               onToggleThemePressed: () =>
                   context.read<ThemeCubit>().toggleTheme(),
-              onAccountPressed: _openAccountHistory,
+              onAccountPressed: _openAccountSettings,
             ),
-            SizedBox(height: layout.sectionSpacing),
+            SizedBox(height: layout.smallSpacing),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _openTransactionsHistory,
+                    icon: const Icon(Icons.receipt_long_rounded, size: 18),
+                    label: const Text(
+                      'السجل',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                SizedBox(width: layout.smallSpacing),
+                Expanded(
+                  child: BlocBuilder<PrinterCubit, PrinterState>(
+                    builder: (context, printerState) {
+                      return OutlinedButton.icon(
+                        onPressed: _openPrinterSettings,
+                        icon: const Icon(Icons.print_rounded, size: 18),
+                        label: Text(
+                          printerState.isConnected
+                              ? 'الطابعة: متصل'
+                              : 'الطابعة',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: layout.itemSpacing),
             WalletSummaryRow(
               balanceLabel: formattedBalance,
               tierLabel: MockStoreData.merchantTierLabel,

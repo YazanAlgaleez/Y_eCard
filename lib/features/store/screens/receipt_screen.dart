@@ -7,9 +7,11 @@ import '../../../core/utils/responsive_layout.dart';
 import '../../../core/widgets/responsive_page_container.dart';
 import '../../printer/cubit/printer_cubit.dart';
 import '../../printer/cubit/printer_state.dart';
+import '../../printer/models/receipt_print_data.dart';
 import '../data/mock_store_data.dart';
 import '../widgets/receipt_card.dart';
 import '../widgets/screen_back_header.dart';
+import 'printer_settings_screen.dart';
 
 /// Displays order confirmation, itemized receipt, and print/share actions.
 class ReceiptScreen extends StatelessWidget {
@@ -29,6 +31,31 @@ class ReceiptScreen extends StatelessWidget {
     required this.quantity,
     required this.totalPaid,
   });
+
+  ReceiptPrintData _buildReceiptPrintData(double remainingBalance) {
+    final cleanVoucher = (voucherCode ?? '').trim();
+    return ReceiptPrintData(
+      operationType: isDirectIdDelivery ? 'شحن مباشر ID' : 'شراء كود',
+      itemTitle: productTitle,
+      quantity: quantity,
+      totalPrice: totalPaid,
+      currencyLabel: MockStoreData.currencyLabel,
+      referenceLabel: isDirectIdDelivery ? 'معرف اللاعب' : 'رمز الكود',
+      referenceValue: isDirectIdDelivery
+          ? playerId
+          : (cleanVoucher.isEmpty ? 'غير متوفر' : cleanVoucher),
+      orderNumber: MockStoreData.sampleOrderNumber,
+      timestamp: MockStoreData.sampleOrderTimestamp,
+      remainingBalance: remainingBalance,
+    );
+  }
+
+  void _openPrinterSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PrinterSettingsScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,30 +90,80 @@ class ReceiptScreen extends StatelessWidget {
                 ),
               ),
             ),
-            BlocBuilder<PrinterCubit, PrinterState>(
+            BlocConsumer<PrinterCubit, PrinterState>(
+              listenWhen: (previous, current) =>
+                  previous.errorMessage != current.errorMessage ||
+                  previous.statusMessage != current.statusMessage ||
+                  previous.status != current.status,
+              listener: (context, printerState) {
+                final messenger = ScaffoldMessenger.of(context);
+                if (printerState.errorMessage != null) {
+                  messenger
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(printerState.errorMessage!),
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    );
+                } else if (printerState.status == PrinterStatus.printSuccess &&
+                    printerState.statusMessage != null) {
+                  messenger
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(printerState.statusMessage!),
+                        backgroundColor: AppColors.emeraldMint,
+                      ),
+                    );
+                }
+              },
               builder: (context, printerState) {
+                final isPrinting = printerState.status == PrinterStatus.printing;
+
                 return Column(
                   children: [
-                    ElevatedButton.icon(
-                      icon: Icon(
-                        printerState.isConnected
-                            ? Icons.print_rounded
-                            : Icons.ios_share_rounded,
-                      ),
-                      label: Text(
-                        printerState.isConnected
-                            ? 'طباعة إيصال (بلوتوث / حراري)'
-                            : 'مشاركة / حفظ الإيصال',
+                    if (printerState.connectedPrinter != null) ...[
+                      Text(
+                        'الطابعة المتصلة: ${printerState.connectedPrinter!.name}',
+                        style: Theme.of(context).textTheme.bodySmall,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      onPressed: () {
-                        if (printerState.isConnected) {
-                          // Trigger Bluetooth thermal receipt print
-                        } else {
-                          // Trigger digital receipt share/save
-                        }
-                      },
+                      SizedBox(height: layout.smallSpacing),
+                    ],
+                    ElevatedButton.icon(
+                      icon: isPrinting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              printerState.isConnected
+                                  ? Icons.print_rounded
+                                  : Icons.settings_rounded,
+                            ),
+                      label: Text(
+                        isPrinting
+                            ? 'جاري الطباعة...'
+                            : printerState.isConnected
+                                ? 'طباعة إيصال (بلوتوث / حراري)'
+                                : 'إعدادات الطابعة',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onPressed: isPrinting
+                          ? null
+                          : () {
+                              if (printerState.isConnected) {
+                                context.read<PrinterCubit>().printReceipt(
+                                      _buildReceiptPrintData(remainingBalance),
+                                    );
+                              } else {
+                                _openPrinterSettings(context);
+                              }
+                            },
                     ),
                     SizedBox(height: layout.smallSpacing),
                     OutlinedButton(

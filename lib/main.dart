@@ -12,6 +12,7 @@ void main() {
       providers: [
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => PrinterCubit()),
+        
       ],
       child: const TopUpStoreApp(),
     ),
@@ -26,7 +27,8 @@ class TopUpStoreApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
-        return MaterialApp(
+        return MaterialApp(showPerformanceOverlay: false,
+        
           debugShowCheckedModeBanner: false,
           title: 'Y eCard',
           themeMode: themeMode,

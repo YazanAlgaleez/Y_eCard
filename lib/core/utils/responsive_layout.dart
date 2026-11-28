@@ -89,6 +89,8 @@ class ResponsiveLayout {
     return double.infinity;
   }
 
+  double? get floatingSnackBarWidth => isTabletWidth ? 460.0 : null;
+
   double get horizontalPadding => scaleWidth(
         AppDimensions.screenHorizontalPadding,
         minFactor: 0.75,
@@ -111,10 +113,14 @@ class ResponsiveLayout {
         maxFactor: 1.25,
       );
 
-  double get filterBarHeight => (36.0 * clampedTextScale).clamp(34.0, 46.0);
+  double get listBottomPadding => scaleHeight(20.0);
+
+  double get filterBarHeight => (40.0 * clampedTextScale).clamp(38.0, 48.0);
 
   double get headerButtonSize =>
-      scaleWidth(40.0, minFactor: 0.88, maxFactor: 1.15);
+      scaleWidth(40.0, minFactor: 0.9, maxFactor: 1.15);
+
+  double get minTouchTarget => 44.0;
 
   int get productGridColumns {
     if (isWideWidth) return 4;
@@ -149,7 +155,7 @@ class ResponsiveLayout {
   double get quantityPillWidth =>
       scaleWidth(44.0, minFactor: 0.9, maxFactor: 1.2);
 
-  double get quantityPillHeight => (36.0 * clampedTextScale).clamp(34.0, 44.0);
+  double get quantityPillHeight => (40.0 * clampedTextScale).clamp(38.0, 48.0);
 
   double get receiptQrSize =>
       scaleHeight(68.0, minFactor: 0.76, maxFactor: 1.15);
